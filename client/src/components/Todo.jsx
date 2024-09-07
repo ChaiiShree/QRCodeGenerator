@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
-const Todo = ({ todo, onDelete, onUpdate }) => {
+const Todo = ({ todo, onDelete, onUpdate, onShortenUrl }) => {
   const [editing, setEditing] = useState(false);
   const [updatedTitle, setUpdatedTitle] = useState(todo.title);
   const [showQRCode, setShowQRCode] = useState(false);
   const [qrCodeImageSrc, setQRCodeImageSrc] = useState(null); // State to store Base64 image src
+  const [shortUrl, setShortUrl] = useState(''); // State to store shortened URL
 
   const handleDelete = () => {
     onDelete(todo._id);
@@ -42,6 +43,11 @@ const Todo = ({ todo, onDelete, onUpdate }) => {
     setShowQRCode(false);
   };
 
+  const handleShortenUrl = async () => {
+    const shortenedUrl = await onShortenUrl(todo.title); // Shorten URL based on todo title
+    setShortUrl(shortenedUrl);
+  };
+
   return (
     <div className={`todo ${todo.completed ? 'completed' : ''}`}>
       <input type="checkbox" checked={todo.completed} onChange={handleToggle} />
@@ -57,8 +63,10 @@ const Todo = ({ todo, onDelete, onUpdate }) => {
           <button onClick={handleEdit}>Edit</button>
           <button onClick={handleDelete}>Delete</button>
           <button onClick={handleShowQRCode}>Display QR</button>
+          <button onClick={handleShortenUrl}>Shorten URL</button>
         </>
       )}
+      {shortUrl && <p>Shortened URL: <a href={shortUrl}>{shortUrl}</a></p>}
       {showQRCode && (
         <div className="overlay">
           <div className="modal">

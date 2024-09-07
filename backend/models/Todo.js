@@ -1,15 +1,26 @@
 const mongoose = require('mongoose');
 
-// Define TodoSchema Schema
+// Define Todo Schema
 const todoSchema = new mongoose.Schema({
-  title: String,
-  completed: Boolean,
+  title: {
+    type: String,
+    required: true, // Ensure title is provided
+  },
+  completed: {
+    type: Boolean,
+    default: false // Set default to `false`
+  },
   qrCode: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'QRCode'
+    ref: 'QRCode' // Reference the QRCode model
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
 });
 
-const TodoSchema = mongoose.model('TodoSchema', todoSchema, 'TodoAppCollections');
+// Create a model for Todo
+const Todo = mongoose.model('Todo', todoSchema, 'TodoAppCollections');
 
-module.exports = { TodoSchema };
+module.exports = { Todo };
