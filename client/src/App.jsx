@@ -1,61 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './App.css'; // Include styles
-import { auth, signInWithPopup, provider, signOut } from './firebase'; // Import from Firebase v9+
-import { useNavigate } from 'react-router-dom';
+import { auth, signInWithPopup, GoogleAuthProvider, signOut } from './firebase'; // Import Firebase auth
+import './App.css'; // Import any CSS for styling
 
 const App = () => {
-  const [originalUrl, setOriginalUrl] = useState('');
-  const [shortenedUrl, setShortenedUrl] = useState('');
-  const [qrCodeImageSrc, setQRCodeImageSrc] = useState(null);
-  const [urlList, setUrlList] = useState([]);
-  const [label, setLabel] = useState(''); // State for label
-  const [user, setUser] = useState(null); // State for authenticated user
-  const navigate = useNavigate();
+  const [originalUrl, setOriginalUrl] = useState(''); // URL to be shortened
+  const [label, setLabel] = useState(''); // Optional label for the URL
+  const [shortenedUrl, setShortenedUrl] = useState(''); // Shortened URL returned from the backend
+  const [qrCodeImageSrc, setQRCodeImageSrc] = useState(null); // QR code image source
+  const [urlList, setUrlList] = useState([]); // List of shortened URLs
+  const [user, setUser] = useState(null); // Firebase authenticated user
 
+  const provider = new GoogleAuthProvider(); // Firebase Google Auth provider
+
+  // Listen to Firebase auth state changes
   useEffect(() => {
-    // Listen for authentication state changes
-    const unsubscribe = auth.onAuthStateChanged(setUser);
-    return () => unsubscribe();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+    return () => unsubscribe(); // Clean up the listener on unmount
   }, []);
 
-  const handleShortenUrl = async () => {
-    try {
-      const response = await axios.post('http://localhost:5050/shorten', { originalUrl });
-      setShortenedUrl(response.data.shortUrl);
-    } catch (error) {
-      console.error('Error shortening URL:', error);
-    }
-  };
-
-  const handleGenerateQRCode = async () => {
-    try {
-      const response = await axios.post('http://localhost:5050/todos/generate-qr', { url: shortenedUrl });
-      const base64Image = `data:image/png;base64,${btoa(
-        new Uint8Array(response.data.qrCodeImage.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
-      )}`;
-      setQRCodeImageSrc(base64Image);
-    } catch (error) {
-      console.error('Error generating QR code:', error);
-    }
-  };
-
-  const handleSave = () => {
-    if (!label) {
-      alert('Please enter a label');
-      return;
-    }
-
-    const newEntry = { label, shortenedUrl, qrCodeImageSrc };
-    setUrlList([...urlList, newEntry]);
-    setLabel(''); // Clear the label input
-  };
-
-  const handleDelete = (index) => {
-    const updatedList = urlList.filter((_, i) => i !== index);
-    setUrlList(updatedList);
-  };
-
+  // Handle login with Google
   const handleLogin = async () => {
     try {
       await signInWithPopup(auth, provider);
@@ -64,13 +30,65 @@ const App = () => {
     }
   };
 
+  // Handle logout
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate('/'); // Redirect to home after logout
     } catch (error) {
       console.error('Error signing out:', error);
     }
+  };
+
+  // Handle URL shortening
+  const handleShortenUrl = async () => {
+    if (!originalUrl || !user) {
+      alert('Please enter a URL and log in to shorten it');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:5050/shorten', {
+        originalUrl,
+        label,
+        userId: user.uid, // Pass the Firebase user ID to the backend
+      });
+      setShortenedUrl(response.data.shortUrl);
+    } catch (error) {
+      console.error('Error shortening URL:', error.response?.data || error);
+    }
+  };
+
+  // Handle QR code generation
+  const handleGenerateQRCode = async () => {
+    if (!shortenedUrl) return;
+
+    try {
+      const response = await axios.post('http://localhost:5050/todos/generate-qr', { url: shortenedUrl });
+      const base64Image = `data:image/png;base64,${btoa(
+        new Uint8Array(response.data.qrCodeImage.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
+      )}`;
+      setQRCodeImageSrc(base64Image); // Set the QR code image
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+    }
+  };
+
+  // Handle saving the URL and QR code to the list
+  const handleSave = () => {
+    if (!label) {
+      alert('Please enter a label for the URL');
+      return;
+    }
+
+    const newEntry = { label, shortenedUrl, qrCodeImageSrc };
+    setUrlList([...urlList, newEntry]); // Add to list
+    setLabel(''); // Clear the label input
+  };
+
+  // Handle URL deletion from the list
+  const handleDelete = (index) => {
+    const updatedList = urlList.filter((_, i) => i !== index); // Remove item at index
+    setUrlList(updatedList);
   };
 
   return (
@@ -78,8 +96,12 @@ const App = () => {
       <header>
         <h1>QR & URL Shortener Dashboard</h1>
         <h2>Shorten URLs and Generate QR Codes Effortlessly</h2>
+
         {user ? (
-          <button onClick={handleLogout} className="btn">Logout</button>
+          <div>
+            <button onClick={handleLogout} className="btn">Logout</button>
+            <p>Welcome, {user.displayName}</p>
+          </div>
         ) : (
           <button onClick={handleLogin} className="btn">Login with Google</button>
         )}
@@ -95,28 +117,28 @@ const App = () => {
             placeholder="Enter URL to shorten"
             className="url-input"
           />
+          <input
+            type="text"
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            placeholder="Enter label for URL"
+            className="url-input"
+          />
           <button onClick={handleShortenUrl} className="btn">Shorten URL</button>
         </div>
-        
+
         {shortenedUrl && (
           <div className="result">
-            <p>Shortened URL: <a href={shortenedUrl} target="_blank" rel="noopener noreferrer">{shortenedUrl}</a></p>
+            <p>
+              Shortened URL: <a href={shortenedUrl} target="_blank" rel="noopener noreferrer">{shortenedUrl}</a>
+            </p>
             <button onClick={handleGenerateQRCode} className="btn">Generate QR Code</button>
             {qrCodeImageSrc && (
               <div className="qr-result">
                 <img src={qrCodeImageSrc} alt="QR Code" />
               </div>
             )}
-            <div className="input-group">
-              <input
-                type="text"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                placeholder="Enter label for URL"
-                className="url-input"
-              />
-              <button onClick={handleSave} className="btn save-btn">Save URL & QR Code</button>
-            </div>
+            <button onClick={handleSave} className="btn save-btn">Save URL & QR Code</button>
           </div>
         )}
       </section>

@@ -1,20 +1,27 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const dotenv = require('dotenv');
 const todosRoutes = require('./routes/todos');
 const urlShortenerRoutes = require('./routes/urlShortener');
-const dotenv = require('dotenv');
-const cors = require('cors');
+const userRoutes = require('./routes/user');
 
 // Load environment variables from .env file
 dotenv.config();
 
 const app = express();
 
-app.use(cors());
-// Middleware
-app.use(express.json());
+// CORS configuration
+const corsOptions = {
+  origin: ['http://localhost:5173'], // Adjust as needed
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+};
 
-// Database connection
+app.use(cors(corsOptions)); // Enable CORS
+app.use(express.json()); // Body parser
+
+// MongoDB connection
 const dbURI = process.env.DB_CONNECTION_STRING;
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
@@ -22,7 +29,8 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 // Routes
 app.use('/todos', todosRoutes);
-app.use('/', urlShortenerRoutes); // '/' to access shorten and redirect routes
+app.use('/shorten', urlShortenerRoutes);
+app.use('/users', userRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5050;
