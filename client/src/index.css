@@ -1,13 +1,33 @@
-body {
+/* General Reset */
+body, html {
   margin: 0;
+  padding: 0;
+  height: 100%;  /* Ensure the body takes full height */
+  background-color: var(--bg-color); /* Dynamically change background */
+  color: var(--text-color); /* Dynamically change text color */
+  transition: background-color 0.3s ease, color 0.3s ease;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/* Add Light Mode */
+.light-mode {
+  --bg-color: #f4f4f4; /* Light mode body background */
+  --text-color: #333; /* Light mode text color */
+}
+
+/* Add Dark Mode */
+.dark-mode {
+  --bg-color: #222; /* Dark mode body background */
+  --text-color: #fff; /* Dark mode text color */
+}
+
+/* Ensure the root element also adjusts */
+#root {
+  min-height: 100vh;
+  background-color: var(--bg-color); /* Change the root background color */
 }

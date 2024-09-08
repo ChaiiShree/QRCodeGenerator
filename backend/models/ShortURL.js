@@ -1,26 +1,12 @@
 const mongoose = require('mongoose');
 
 const shortUrlSchema = new mongoose.Schema({
-  originalUrl: {
-    type: String,
-    required: true,
-  },
-  shortCode: {
-    type: String,
-    required: true,
-    unique: true, // Ensure short codes are unique
-  },
-  label: {
-    type: String,
-  },
-  userId: {
-    type: String, // Storing userId from Firebase, which is a string
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  originalUrl: { type: String, required: true },
+  shortCode: { type: String, required: true, unique: true },
+  label: { type: String, default: '' },
+  userId: { type: String, required: true }, // This can now be 'anonymous' or a user ID
+  clicks: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const ShortURL = mongoose.model('ShortURL', shortUrlSchema);

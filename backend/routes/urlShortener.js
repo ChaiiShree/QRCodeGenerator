@@ -13,11 +13,6 @@ router.post('/shorten', async (req, res) => {
     return res.status(400).json({ message: 'Invalid URL' });
   }
 
-  // Ensure userId is provided
-  if (!userId) {
-    return res.status(400).json({ message: 'Invalid user ID' });
-  }
-
   try {
     const shortCode = await generateShortCode();
 
@@ -26,7 +21,7 @@ router.post('/shorten', async (req, res) => {
       originalUrl,
       shortCode,
       label: label || '',
-      userId,
+      userId: userId || 'anonymous', // Use 'anonymous' if userId is not provided
       clicks: 0, // Initialize clicks to 0
     });
 

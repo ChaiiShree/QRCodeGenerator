@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { auth, signInWithPopup, GoogleAuthProvider, signOut } from './firebase'; // Import Firebase auth
-import './App.css'; // Import any CSS for styling
+import { auth, signInWithPopup, GoogleAuthProvider, signOut } from './firebase'; // Firebase auth
+import './App.css'; // Styling
+import Footer from './components/Footer'; // Footer component
+import { ThemeProvider, useTheme } from './ThemeContext'; // Theme context for dark mode
 
-const App = () => {
+const AppContent = () => {
   const [originalUrl, setOriginalUrl] = useState(''); // URL to be shortened
   const [label, setLabel] = useState(''); // Optional label for the URL
-  const [shortenedUrl, setShortenedUrl] = useState(''); // Shortened URL returned from the backend
+  const [shortenedUrl, setShortenedUrl] = useState(''); // Shortened URL from backend
   const [qrCodeImageSrc, setQRCodeImageSrc] = useState(null); // QR code image source
   const [urlList, setUrlList] = useState([]); // List of shortened URLs
   const [user, setUser] = useState(null); // Firebase authenticated user
+  const { darkMode, toggleTheme } = useTheme(); // Dark mode from context
 
   const provider = new GoogleAuthProvider(); // Firebase Google Auth provider
 
@@ -39,26 +42,32 @@ const App = () => {
     }
   };
 
-  // Handle URL shortening
+  // Handle URL shortening (login not required)
   const handleShortenUrl = async () => {
-    if (!originalUrl || !user) {
-      alert('Please enter a URL and log in to shorten it');
+    if (!originalUrl) {
+      alert('Please enter a URL to shorten');
       return;
     }
 
     try {
-      const response = await axios.post('http://localhost:5050/shorten', {
+      const requestBody = {
         originalUrl,
         label,
-        userId: user.uid, // Pass the Firebase user ID to the backend
-      });
+      };
+
+      // If the user is logged in, include their userId
+      if (user) {
+        requestBody.userId = user.uid;
+      }
+
+      const response = await axios.post('http://localhost:5050/shorten', requestBody);
       setShortenedUrl(response.data.shortUrl);
     } catch (error) {
       console.error('Error shortening URL:', error.response?.data || error);
     }
   };
 
-  // Handle QR code generation
+  // Handle QR code generation (no login required)
   const handleGenerateQRCode = async () => {
     if (!shortenedUrl) return;
 
@@ -92,13 +101,17 @@ const App = () => {
   };
 
   return (
-    <div className="app-container">
+    <div className={`app-container ${darkMode ? 'dark-mode' : 'light-mode'}`}>
       <header>
-        <h1>QR & URL Shortener Dashboard</h1>
+        <h1>QR & URL Shortener</h1>
         <h2>Shorten URLs and Generate QR Codes Effortlessly</h2>
+        
+        <button onClick={toggleTheme} className="btn theme-toggle">
+          {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        </button>
 
         {user ? (
-          <div>
+          <div className='Logbtn'>
             <button onClick={handleLogout} className="btn">Logout</button>
             <p>Welcome, {user.displayName}</p>
           </div>
@@ -156,7 +169,17 @@ const App = () => {
           ))}
         </ul>
       </section>
+
+      <Footer />
     </div>
+  );
+};
+
+const App = () => {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 };
 
