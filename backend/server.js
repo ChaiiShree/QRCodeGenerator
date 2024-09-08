@@ -27,7 +27,10 @@ mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error('Failed to connect to MongoDB:', err));
 
-// Routes
+// Add this line to handle short URL redirects
+app.use('/', urlShortenerRoutes);
+
+// Other routes
 app.use('/todos', todosRoutes);
 app.use('/shorten', urlShortenerRoutes);
 app.use('/users', userRoutes);
