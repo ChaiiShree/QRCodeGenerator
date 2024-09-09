@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { ShortURL } = require('../models/ShortUrl');
+const { ShortURL } = require('../models/ShortURL');
 
 // Function to generate a random short code
 async function generateShortCode(length = 6) {
