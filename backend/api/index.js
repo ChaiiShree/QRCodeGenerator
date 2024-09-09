@@ -2,11 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const todosRoutes = require('../routes/todos'); // Ensure correct path
-const urlShortenerRoutes = require('../routes/urlShortener'); // Ensure correct path
-const userRoutes = require('../routes/user'); // Ensure correct path
-
-// Load environment variables from .env file
+const todosRoutes = require('../routes/todos'); 
+const urlShortenerRoutes = require('../routes/urlShortener'); 
+const userRoutes = require('../routes/user'); 
 dotenv.config();
 
 const app = express();
