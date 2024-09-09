@@ -1,7 +1,7 @@
 const express = require('express');
-const { ShortURL } = require('../models/ShortUrl');
+const { ShortURL } = require('../models/ShortUrl'); // Ensure correct path
 const validUrl = require('valid-url');
-const { generateShortCode } = require('../utils/urlUtils');
+const { generateShortCode } = require('../utils/urlUtils'); // Ensure correct path
 const router = express.Router();
 
 // POST to create a shortened URL

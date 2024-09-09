@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const todosRoutes = require('../routes/todos');
-const urlShortenerRoutes = require('../routes/urlShortener');
-const userRoutes = require('../routes/user');
+const todosRoutes = require('./routes/todos'); // Ensure correct path
+const urlShortenerRoutes = require('./routes/urlShortener'); // Ensure correct path
+const userRoutes = require('./routes/user'); // Ensure correct path
 
 // Load environment variables from .env file
 dotenv.config();
@@ -13,7 +13,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://qrurl.vercel.app', 'https://qrurlapi.vercel.app/'], // Adjust as needed
+  origin: ['http://localhost:5173', 'https://qrurl.vercel.app', 'https://qrurlapi.vercel.app/'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 };
