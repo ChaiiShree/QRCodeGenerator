@@ -13,7 +13,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: ['http://localhost:5173', 'https://qrurl.vercel.app'], // Adjust as needed
+  origin: ['http://localhost:5173', 'https://qrurl.vercel.app', 'https://qrurlapi.vercel.app/'], // Adjust as needed
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 };
