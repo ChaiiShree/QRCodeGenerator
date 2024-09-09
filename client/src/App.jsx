@@ -60,7 +60,7 @@ const AppContent = () => {
         requestBody.userId = user.uid;
       }
 
-      const response = await axios.post('http://localhost:5050/shorten', requestBody);
+      const response = await axios.post('https://qrurlapi.vercel.app/shorten', requestBody);
       setShortenedUrl(response.data.shortUrl);
     } catch (error) {
       console.error('Error shortening URL:', error.response?.data || error);
@@ -72,7 +72,7 @@ const AppContent = () => {
     if (!shortenedUrl) return;
 
     try {
-      const response = await axios.post('http://localhost:5050/todos/generate-qr', { url: shortenedUrl });
+      const response = await axios.post('https://qrurlapi.vercel.app/todos/generate-qr', { url: shortenedUrl });
       const base64Image = `data:image/png;base64,${btoa(
         new Uint8Array(response.data.qrCodeImage.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
       )}`;
