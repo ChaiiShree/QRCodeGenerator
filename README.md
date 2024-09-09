@@ -1,4 +1,4 @@
-# QRCODE Generator MERN Starter Template
+# QRCODE Generator + URL Shortener
 
 This is a starter template for building applications using React for the frontend, Node.js with Express for the backend, and MongoDB for the database.
 
@@ -19,12 +19,12 @@ This is a starter template for building applications using React for the fronten
  
 1. Clone the repository:
     ```bash
-    git clone https://github.com/AppAnySite/BBlocks.git
+    git clone https://github.com/ChaiiShree/QRCodeGenerator.git
     ```
 
 2. Navigate to the project directory:
     ```bash
-    cd BBlocks/QRCodeGenerator-MERN
+    cd ChaiiShree/QRCodeGenerator
     ```
 
 3. Install dependencies for the client:
